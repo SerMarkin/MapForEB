@@ -1,5 +1,5 @@
 import turtle
-from graphics import *
+from PycharmProjects.ModelsGragh.graphics import *
 import math
 import random
 
@@ -85,6 +85,102 @@ def staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
 COLORS = ['blue', 'yellow', 'black', 'green', 'orange']
 
 
+def LeftPart(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
+    board = [lhXY, mhXY, rhXY, rmXY, rdXY, mdXY, ldXY, lmXY]
+    allSM = []  # All Static Models (LeftPart)
+    buf = []
+    for i in range(len(board)):
+        buf += [[Line(board[i], board[(i + 1) % len(board)]).draw(win)]]
+
+    allSM += [buf]
+    pK = 36 * k
+    dis = 50 * k
+    cirRad = 60 * k
+    rad = 5 * k
+    hsliv = 25 * k
+    PlaceforBall = 23 * k
+    # Баки для воды
+    allSM += [[Rectangle(lhXY, Point(lhXY.getX() + pK, lhXY.getY() - pK)).draw(win)]]
+    # Cтратовые зоны
+    allSM += [[Rectangle(lhXY, Point(lhXY.getX() + pK, lhXY.getY() + 2 * pK)).draw(win)]]
+
+    # Зоны для маячков слева
+    allSM += [[Rectangle(lhXY, Point(lhXY.getX() - pK / 3, lhXY.getY() + pK / 3)).draw(win),
+               Rectangle(lmXY, Point(lmXY.getX() - pK / 3, lmXY.getY() - pK / 3)).draw(win),
+               Rectangle(ldXY, Point(ldXY.getX() - pK / 3, ldXY.getY() - pK / 3)).draw(win)]]
+
+    # Сливы для воды слева\справа
+    allSM += [[Circle(Point(lmXY.getX() + cirRad / 4, lmXY.getY() - cirRad / 4), rad).draw(win)]]
+
+    # Сливы для воды снизу - слева\справа
+    allSM += [[Circle(Point(ldXY.getX() + cirRad, ldXY.getY() - cirRad / 4), rad).draw(win)]]
+
+    # Место для грязных водных шаров
+    allSM += [[Rectangle(mdXY, Point(mdXY.getX() + cirRad, mdXY.getY() - hsliv)).draw(win)]]
+
+    # Место "цветка"
+    allSM += [[Rectangle(mdXY, Point(mdXY.getX() - PlaceforBall, mdXY.getY() + PlaceforBall)).draw(win)]]
+
+    # Зона пчелки
+    StartPointForBeeLeftXY = Point(ldXY.getX(), ldXY.getY() + PlaceforBall / 2)
+    StartPointForBeeRightXY = Point(rdXY.getX(), rdXY.getY() + PlaceforBall / 2)
+
+    allSM += [[Line(ldXY, StartPointForBeeLeftXY).draw(win)]]
+
+    allSM += [
+        [Line(StartPointForBeeLeftXY, Point(mdXY.getX() - PlaceforBall, mdXY.getY() + PlaceforBall / 2)).draw(win)]]
+
+    mlhmhXY = Point(mhXY.getX() - dis, mhXY.getY())
+    mmhrlXY = Point(mhXY.getX() + dis, mhXY.getY())
+    allSM += [[Rectangle(mlhmhXY, Point(mmhrlXY.getX(), mmhrlXY.getY() - 20 * k)).draw(win)]]
+
+    # Линии езды
+
+    allSM += [[Line(Point(lhXY.getX(), lhXY.getY() + pK), Point(mhXY.getX(), mhXY.getY() + pK)).draw(win)]]
+
+    allSM += [[
+        Line(Point(ldXY.getX() + cirRad, rdXY.getY() - pK), Point(ldXY.getX() + cirRad, lhXY.getY() + pK)).draw(win)]]
+
+    allSM += [[Line(Point(lmXY.getX() + cirRad / 2, lmXY.getY() - cirRad / 4),
+                    Point(mmXY.getX() - cirRad, lmXY.getY() - cirRad / 4)).draw(win)]]
+
+    # полукруги
+    rad1 = 35 * k
+
+    allSM += [[Circle(Point(ldXY.getX() + cirRad, rdXY.getY()), rad1).draw(win)]]
+    return allSM
+
+
+def Mirrow(win, x, allSM):
+    p = Point(1, 1)
+    Rect = Rectangle(p, p)
+    Circ = Circle(p, 1)
+    line = Line(p, p)
+    RP = []
+    print(allSM)
+    for objL in allSM:
+        buf = []
+        print(objL)
+        for obj in objL:
+            if type(Rect) == type(obj):
+                x1 = obj.getP1().getX()
+                y1 = obj.getP1().getY()
+                x2 = obj.getP2().getX()
+                y2 = obj.getP2().getY()
+                buf += [Rectangle(Point(x + (x - x1), y1), Point(x + (x - x2), y2)).draw(win)]
+            elif type(Circ) == type(obj):
+                x1 = obj.getCenter().getX()
+                y1 = obj.getCenter().getY()
+                r = obj.getRadius()
+                buf += [Circle(Point(x + (x - x1), y1), r).draw(win)]
+            elif type(line) == type(obj):
+                x1 = obj.getP1().getX()
+                y1 = obj.getP1().getY()
+                x2 = obj.getP2().getX()
+                y2 = obj.getP2().getY()
+                buf += [Line(Point(x + (x - x1), y1), Point(x + (x - x2), y2)).draw(win)]
+
+
 def sklad(win, center, k):
     a = 6 * k
     x = center.getX()
@@ -121,8 +217,9 @@ def main():
     mdXY = Point(ldXY.getX() + w, ldXY.getY())
     rdXY = Point(mdXY.getX() + w, mdXY.getY())
 
-    staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k)
-
+    # staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k)
+    allModels = LeftPart(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k)
+    Mirrow(win, mmXY.getX(), allModels)
     BRsize = 30 * k
     MRsize = 20 * k
     BigRobot = Rectangle(lhXY, Point(lhXY.getX() + BRsize, lhXY.getY() + BRsize)).draw(win)
@@ -137,7 +234,6 @@ def main():
     S1 = sklad(win, centerS1, k)
     S2 = sklad(win, centerS2, k)
     S3 = sklad(win, centerS3, k)
-    # Шары и блоки для строительства
 
     win.getMouse()  # Pause to view result
     win.close()  # Close window when done
