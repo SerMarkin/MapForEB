@@ -1,6 +1,7 @@
 import turtle
 from graphics import *
 import math
+import random
 
 
 def staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
@@ -24,12 +25,12 @@ def staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
 
     # Зоны для маячков слева
     Rectangle(lhXY, Point(lhXY.getX() - pK / 3, lhXY.getY() + pK / 3)).draw(win)
-    Rectangle(lmXY, Point(lmXY.getX() - pK / 3, lmXY.getY() + pK / 3)).draw(win)
+    Rectangle(lmXY, Point(lmXY.getX() - pK / 3, lmXY.getY() - pK / 3)).draw(win)
     Rectangle(ldXY, Point(ldXY.getX() - pK / 3, ldXY.getY() - pK / 3)).draw(win)
 
     # Зоны для маячков справа
     Rectangle(rhXY, Point(rhXY.getX() + pK / 3, rhXY.getY() + pK / 3)).draw(win)
-    Rectangle(rmXY, Point(rmXY.getX() + pK / 3, rmXY.getY() + pK / 3)).draw(win)
+    Rectangle(rmXY, Point(rmXY.getX() + pK / 3, rmXY.getY() - pK / 3)).draw(win)
     Rectangle(rdXY, Point(rdXY.getX() + pK / 3, rdXY.getY() - pK / 3)).draw(win)
 
     # Сливы для воды слева\справа
@@ -69,10 +70,38 @@ def staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
     Line(Point(ldXY.getX() + cirRad, rdXY.getY() - pK), Point(ldXY.getX() + cirRad, lhXY.getY() + pK)).draw(win)
     Line(Point(rdXY.getX() - cirRad, rdXY.getY() - pK), Point(rdXY.getX() - cirRad, rhXY.getY() + pK)).draw(win)
 
+    Line(Point(lmXY.getX() + cirRad / 2, lmXY.getY() - cirRad / 4),
+         Point(mmXY.getX() - cirRad, lmXY.getY() - cirRad / 4)).draw(win)
+
+    Line(Point(rmXY.getX() - 0.5 * cirRad, rmXY.getY() - cirRad / 4),
+         Point(rmXY.getX() - 1.5 * cirRad, rmXY.getY() - cirRad / 4)).draw(win)
+
     # полукруги
     rad1 = 35 * k
     Circle(Point(ldXY.getX() + cirRad, rdXY.getY()), rad1).draw(win)
     Circle(Point(rdXY.getX() - cirRad, rdXY.getY()), rad1).draw(win)
+
+
+COLORS = ['blue', 'yellow', 'black', 'green', 'orange']
+
+
+def sklad(win, center, k):
+    a = 6 * k
+    x = center.getX()
+    y = center.getY()
+    for i in range(len(COLORS)):
+        rand = random.randint(0, len(COLORS) - 1)
+        COLORS[i], COLORS[rand] = COLORS[rand], COLORS[i]
+    rc = Rectangle(center, Point(x + a, y + a)).draw(win)
+    ru = Rectangle(center, Point(x + a, y - a)).draw(win)
+    rr = Rectangle(Point(x + a, y), Point(x + 2 * a, y + a)).draw(win)
+    rd = Rectangle(Point(x, y + a), Point(x + a, y + 2 * a)).draw(win)
+    rl = Rectangle(center, Point(x - a, y + a)).draw(win)
+
+    skl = [rc, ru, rr, rd, rl]
+    for i, k in enumerate(skl):
+        k.setFill(COLORS[i])
+    return skl
 
 
 def main():
@@ -101,7 +130,14 @@ def main():
     MedRobot = Rectangle(Point(lhXY.getX(), lhXY.getY() + 36 * k),
                          Point(lhXY.getX() + MRsize, lhXY.getY() + 36 * k + MRsize)).draw(win)
     MedRobot.setFill(("blue"))
-    # BigRobot.move(0,200)
+    cirRad = 60 * k
+    centerS1 = Point(lmXY.getX() + cirRad / 2, lmXY.getY() + cirRad / 4.5)
+    centerS2 = Point(mmXY.getX() - 1.15 * cirRad, lmXY.getY() - cirRad / 1.5)
+    centerS3 = Point(mmXY.getX() - 0.9 * cirRad, ldXY.getY() - cirRad / 1.5)
+    S1 = sklad(win, centerS1, k)
+    S2 = sklad(win, centerS2, k)
+    S3 = sklad(win, centerS3, k)
+    # Шары и блоки для строительства
 
     win.getMouse()  # Pause to view result
     win.close()  # Close window when done
