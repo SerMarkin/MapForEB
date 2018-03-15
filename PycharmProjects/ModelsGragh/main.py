@@ -84,7 +84,7 @@ def staticModels(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
 
 COLORS = ['blue', 'yellow', 'black', 'green', 'orange']
 
-
+"""Function create left part of map"""
 def LeftPart(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
     board = [lhXY, mhXY, rhXY, rmXY, rdXY, mdXY, ldXY, lmXY]
     allSM = []  # All Static Models (LeftPart)
@@ -123,8 +123,6 @@ def LeftPart(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
 
     # Зона пчелки
     StartPointForBeeLeftXY = Point(ldXY.getX(), ldXY.getY() + PlaceforBall / 2)
-    StartPointForBeeRightXY = Point(rdXY.getX(), rdXY.getY() + PlaceforBall / 2)
-
     allSM += [[Line(ldXY, StartPointForBeeLeftXY).draw(win)]]
 
     allSM += [
@@ -150,17 +148,21 @@ def LeftPart(win, lhXY, mhXY, rhXY, lmXY, mmXY, rmXY, ldXY, mdXY, rdXY, k):
     allSM += [[Circle(Point(ldXY.getX() + cirRad, rdXY.getY()), rad1).draw(win)]]
     return allSM
 
-
+"""Function reflects all static element regarding x
+    :param win -- Graphic Window
+    :param x -- asic
+    :param allSM -- all Static Models
+    :return 
+"""
 def Mirrow(win, x, allSM):
     p = Point(1, 1)
     Rect = Rectangle(p, p)
     Circ = Circle(p, 1)
     line = Line(p, p)
     RP = []
-    print(allSM)
+    LP = allSM[:]
     for objL in allSM:
         buf = []
-        print(objL)
         for obj in objL:
             if type(Rect) == type(obj):
                 x1 = obj.getP1().getX()
@@ -179,15 +181,16 @@ def Mirrow(win, x, allSM):
                 x2 = obj.getP2().getX()
                 y2 = obj.getP2().getY()
                 buf += [Line(Point(x + (x - x1), y1), Point(x + (x - x2), y2)).draw(win)]
+        RP += [buf]
+    return LP, RP
 
-
+"""Function for creating building kubs
+ :return [], where every element is Rectanle
+ """
 def sklad(win, center, k):
     a = 6 * k
     x = center.getX()
     y = center.getY()
-    for i in range(len(COLORS)):
-        rand = random.randint(0, len(COLORS) - 1)
-        COLORS[i], COLORS[rand] = COLORS[rand], COLORS[i]
     rc = Rectangle(center, Point(x + a, y + a)).draw(win)
     ru = Rectangle(center, Point(x + a, y - a)).draw(win)
     rr = Rectangle(Point(x + a, y), Point(x + 2 * a, y + a)).draw(win)
@@ -195,9 +198,23 @@ def sklad(win, center, k):
     rl = Rectangle(center, Point(x - a, y + a)).draw(win)
 
     skl = [rc, ru, rr, rd, rl]
-    for i, k in enumerate(skl):
-        k.setFill(COLORS[i])
     return skl
+
+
+"""
+    The function for drawing kubs for bulding
+    :param objs -- [] , where every element is Rectangle
+    :return [] 
+"""
+
+
+def drawingSklad(objs):
+    for i in range(len(COLORS)):
+        rand = random.randint(0, len(COLORS) - 1)
+        COLORS[i], COLORS[rand] = COLORS[rand], COLORS[i]
+    for j, k in enumerate(objs):
+        k.setFill(COLORS[j])
+    return objs
 
 
 def main():
@@ -234,7 +251,11 @@ def main():
     S1 = sklad(win, centerS1, k)
     S2 = sklad(win, centerS2, k)
     S3 = sklad(win, centerS3, k)
-
+    LS, RS = Mirrow(win, mmXY.getX(), [S1, S2, S3])
+    for i in LS:
+        drawingSklad(i)
+    for i in RS:
+        drawingSklad(i)
     win.getMouse()  # Pause to view result
     win.close()  # Close window when done
 
